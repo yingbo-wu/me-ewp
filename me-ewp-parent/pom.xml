@@ -1,0 +1,25 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>cn.rongcapital.mc2</groupId>
+	<artifactId>me-ewp-parent</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>me-ewp-parent</name>
+	<url>http://maven.apache.org</url>
+
+	<modules>
+		<module>../../me-dependencies</module>
+		<module>../../me-commons/me-commons-infrastructure</module>
+		<module>../../me-commons/me-commons-util</module>
+		<module>../../me-commons/me-commons-communication</module>
+		<module>../../me-commons/me-commons-feign</module>
+		<module>../../me-commons/me-commons-model</module>
+		<module>../me-ewp-api</module>
+		<module>../me-ewp-app</module>
+		<module>../me-ewp-data</module>
+		<module>../me-ewp-domain</module>
+	</modules>
+</project>

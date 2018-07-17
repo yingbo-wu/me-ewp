@@ -1,0 +1,35 @@
+package cn.rongcapital.mc2.me.ewp.data.store;
+
+import javax.cache.Cache.Entry;
+import javax.cache.integration.CacheLoaderException;
+import javax.cache.integration.CacheWriterException;
+
+import org.apache.ignite.cache.store.CacheStoreAdapter;
+
+import cn.rongcapital.mc2.me.commons.infrastructure.spring.BeanContext;
+import cn.rongcapital.mc2.me.ewp.data.dao.CampaignFlowDao;
+import cn.rongcapital.mc2.me.ewp.domain.model.CampaignFlow;
+
+public class CampaignFlowStore extends CacheStoreAdapter<Object, CampaignFlow> {
+
+	@Override
+	public CampaignFlow load(Object key) throws CacheLoaderException {
+		CampaignFlowDao dao = BeanContext.build().getBean(CampaignFlowDao.class);
+		return dao.findOne((String) key);
+	}
+
+	@Override
+	public void write(Entry<? extends Object, ? extends CampaignFlow> entry) throws CacheWriterException {
+		CampaignFlowDao dao = BeanContext.build().getBean(CampaignFlowDao.class);
+		CampaignFlow entity = entry.getValue();
+		entity.setId((String) entry.getKey());
+		dao.save(entity);
+	}
+
+	@Override
+	public void delete(Object key) throws CacheWriterException {
+		CampaignFlowDao dao = BeanContext.build().getBean(CampaignFlowDao.class);
+		dao.delete(load(key));
+	}
+
+}
