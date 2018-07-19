@@ -52,14 +52,15 @@ public class CampaignNodeComponent {
 	 * 创建上下文对象
 	 * 
 	 * @param mid
+	 * @param campaignId
 	 * @param flowId
 	 * @param nodeId
 	 * @param nodeType
 	 * @return
 	 */
-	public EwpContext newContext(int mid, String flowId, String nodeId, String nodeType) {
+	public EwpContext newContext(int mid, String campaignId, String flowId, String nodeId, String nodeType) {
 		String ndataJson = GsonUtils.create().toJson(this.data);
-		return new EwpContext(mid, flowId, nodeId, nodeType, ndataJson);
+		return new EwpContext(mid, campaignId, flowId, nodeId, nodeType, ndataJson);
 	}
 
 	/**

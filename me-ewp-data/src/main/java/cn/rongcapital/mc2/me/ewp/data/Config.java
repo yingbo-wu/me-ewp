@@ -1,7 +1,6 @@
 package cn.rongcapital.mc2.me.ewp.data;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -13,8 +12,6 @@ import org.apache.ignite.IgniteCheckedException;
 import org.apache.ignite.IgniteSpring;
 import org.apache.ignite.configuration.CacheConfiguration;
 import org.apache.ignite.configuration.IgniteConfiguration;
-import org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi;
-import org.apache.ignite.spi.discovery.tcp.ipfinder.vm.TcpDiscoveryVmIpFinder;
 import org.apache.ignite.springdata.repository.config.EnableIgniteRepositories;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +34,8 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.ServerAddress;
 
+import cn.rongcapital.mc2.me.commons.infrastructure.ignite.IgniteCacheLoader;
+import cn.rongcapital.mc2.me.commons.infrastructure.ignite.IgniteNodeFilter;
 import cn.rongcapital.mc2.me.commons.infrastructure.ignite.IgniteNodeType;
 import cn.rongcapital.mc2.me.commons.infrastructure.spring.BeanContext;
 import cn.rongcapital.mc2.me.ewp.data.store.CampaignFlowStore;
@@ -67,17 +66,16 @@ public class Config {
 	private String database;
 
 	@Bean
+	public IgniteCacheLoader igniteCacheLoader() {
+		return new IgniteCacheLoader();
+	}
+
+	@Bean
 	public CacheConfiguration<String, CampaignFlow> campaignFlowCacheConfig() {
-		CacheConfiguration<String, CampaignFlow> cacheConfig = new CacheConfiguration<String, CampaignFlow>(Consts.CAMPAIGN_FLOW_CACHE_NAME);
+		CacheConfiguration<String, CampaignFlow> cacheConfig = new CacheConfiguration<String, CampaignFlow>(CacheName.CAMPAIGN_FLOW_CACHE_NAME);
 		// Setting SQL schema for the cache.
 		cacheConfig.setIndexedTypes(String.class, CampaignFlow.class);
-		cacheConfig.setNodeFilter(node -> {
-			Boolean value = node.attribute(IgniteNodeType.DATA_NODE.name());
-			if (null != value) {
-				return value.booleanValue();
-			}
-			return false;
-		});
+		cacheConfig.setNodeFilter(new IgniteNodeFilter(IgniteNodeType.DATA_NODE));
 		cacheConfig.setCacheStoreFactory(FactoryBuilder.factoryOf(CampaignFlowStore.class));
 		cacheConfig.setWriteBehindEnabled(true);
 		cacheConfig.setReadThrough(true);
@@ -87,16 +85,10 @@ public class Config {
 
 	@Bean
 	public CacheConfiguration<String, CampaignNode> campaignNodeCacheConfig() {
-		CacheConfiguration<String, CampaignNode> cacheConfig = new CacheConfiguration<String, CampaignNode>(Consts.CAMPAIGN_NODE_CACHE_NAME);
+		CacheConfiguration<String, CampaignNode> cacheConfig = new CacheConfiguration<String, CampaignNode>(CacheName.CAMPAIGN_NODE_CACHE_NAME);
 		// Setting SQL schema for the cache.
 		cacheConfig.setIndexedTypes(String.class, CampaignNode.class);
-		cacheConfig.setNodeFilter(node -> {
-			Boolean value = node.attribute(IgniteNodeType.DATA_NODE.name());
-			if (null != value) {
-				return value.booleanValue();
-			}
-			return false;
-		});
+		cacheConfig.setNodeFilter(new IgniteNodeFilter(IgniteNodeType.DATA_NODE));
 		cacheConfig.setCacheStoreFactory(FactoryBuilder.factoryOf(CampaignNodeStore.class));
 		cacheConfig.setWriteBehindEnabled(true);
 		cacheConfig.setReadThrough(true);
@@ -106,16 +98,11 @@ public class Config {
 
 	@Bean
 	public Ignite igniteInstance() {
-		TcpDiscoverySpi discoverySpi = new TcpDiscoverySpi();
-		TcpDiscoveryVmIpFinder ipFinder = new TcpDiscoveryVmIpFinder();
-		ipFinder.setAddresses(Arrays.asList(addresses));
-		discoverySpi.setIpFinder(ipFinder);
 		// Ignite persistence configuration.
 		// DataStorageConfiguration storageConfiguration = new DataStorageConfiguration();
 		// Enabling the persistence.
 		// storageConfiguration.getDefaultDataRegionConfiguration().setPersistenceEnabled(true);
 		IgniteConfiguration configuration = new IgniteConfiguration();
-		configuration.setDiscoverySpi(discoverySpi);
 		configuration.setUserAttributes(Collections.singletonMap(IgniteNodeType.DATA_NODE.name(), true));
 		// Setting some custom name for the node.
 		configuration.setIgniteInstanceName(name);

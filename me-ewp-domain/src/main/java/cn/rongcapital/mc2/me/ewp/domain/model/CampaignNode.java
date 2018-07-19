@@ -33,6 +33,7 @@ import cn.rongcapital.mc2.me.ewq.api.dto.CampaignQueuePushIn;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+@SuppressWarnings("serial")
 @Document(collection = "campaign_node")
 public class CampaignNode extends IgniteEntity {
 
@@ -40,6 +41,11 @@ public class CampaignNode extends IgniteEntity {
 	@QuerySqlField(index = true)
 	@Field(FieldName.FIELD_TENANT_ID)
 	private int tenantId;
+
+	@Expose
+	@QuerySqlField(index = true)
+	@Field(FieldName.FIELD_CAMPAIGN_ID)
+	private String campaignId;
 
 	@Expose
 	@QuerySqlField(index = true)
@@ -107,6 +113,16 @@ public class CampaignNode extends IgniteEntity {
 	}
 
 	/**
+	 * 追加租户ID
+	 * @param campaignId
+	 * @return
+	 */
+	public CampaignNode appendCampaignId(String campaignId) {
+		this.campaignId = campaignId;
+		return this;
+	}
+
+	/**
 	 * 追加流程ID
 	 * @param flowId
 	 * @return
@@ -152,13 +168,13 @@ public class CampaignNode extends IgniteEntity {
 	 */
 	public void createStat() {
 		CampaignStatApi campaignStatApi = IgniteServiceFactory.newService(CampaignStatApi.class);
-		CampaignNodeType typeEnum = CampaignNodeType.valueOf(type);
+		CampaignNodeType typeEnum = CampaignNodeType.valueOf(this.type);
 		if (CampaignNodeType.START.equals(typeEnum)) {
 			int stayCount = this.component.extractCount();
-			CampaignStatCreateIn in = new CampaignStatCreateIn(flowId, nodeId, type, stayCount);
+			CampaignStatCreateIn in = new CampaignStatCreateIn(this.campaignId, this.flowId, this.nodeId, this.type, stayCount);
 			campaignStatApi.create(in);
 		} else {
-			CampaignStatCreateIn in = new CampaignStatCreateIn(flowId, nodeId, type, 0);
+			CampaignStatCreateIn in = new CampaignStatCreateIn(this.campaignId, this.flowId, this.nodeId, this.type, 0);
 			campaignStatApi.create(in);
 		}
 	}
@@ -169,7 +185,7 @@ public class CampaignNode extends IgniteEntity {
 	 * @return
 	 */
 	public String newContextJson(int mid) {
-		EwpContext context = this.component.newContext(mid, this.flowId, this.nodeId, this.type);
+		EwpContext context = this.component.newContext(mid, this.campaignId, this.flowId, this.nodeId, this.type);
 		return GsonUtils.create().toJson(context);
 	}
 

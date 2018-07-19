@@ -15,6 +15,7 @@ import cn.rongcapital.mc2.me.commons.infrastructure.ignite.IgniteEntity;
 import cn.rongcapital.mc2.me.commons.infrastructure.redisson.RedissonEventPublisher;
 import cn.rongcapital.mc2.me.ewp.domain.FieldName;
 
+@SuppressWarnings("serial")
 @Document(collection = "campaign_flow")
 public class CampaignFlow extends IgniteEntity {
 
@@ -49,7 +50,7 @@ public class CampaignFlow extends IgniteEntity {
 	 * @return
 	 */
 	public List<CampaignNode> parseNodes() {
-		return this.diagram.parseNodes(this.tenantId, this.id);
+		return this.diagram.parseNodes(this.tenantId, this.campaignId, this.id);
 	}
 
 	/**

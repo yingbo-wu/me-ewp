@@ -22,10 +22,10 @@ public class CampaignFlowDiagram {
 	 * 解析活动节点
 	 * @return
 	 */
-	public List<CampaignNode> parseNodes(int tenantId, String flowId) {
+	public List<CampaignNode> parseNodes(int tenantId, String campaignId, String flowId) {
 		List<CampaignNode> nodes = GsonUtils.createExposeLowerCaseWithUnderscores().fromJson(this.nodes, new TypeToken<List<CampaignNode>>() {}.getType());
 		nodes.stream().forEach(node -> {
-			node.appendTenandId(tenantId).appendFlowId(flowId);
+			node.appendTenandId(tenantId).appendCampaignId(campaignId).appendFlowId(flowId);
 		});
 		return nodes;
 	}
